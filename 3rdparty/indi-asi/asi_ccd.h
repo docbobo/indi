@@ -181,6 +181,9 @@ class ASICCD : public INDI::CCD
         std::mutex condMutex;
         std::condition_variable cv;
 
+	int expRetry;
+	int statRetry;
+
         // ST4
         float WEPulseRequest;
         struct timeval WEPulseStart;

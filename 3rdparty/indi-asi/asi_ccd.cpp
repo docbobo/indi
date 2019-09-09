@@ -1014,6 +1014,9 @@ bool ASICCD::StartExposure(float duration)
 {
     ASI_ERROR_CODE errCode = ASI_SUCCESS;
 
+    expRetry = 0;
+    statRetry = 0;
+
     PrimaryCCD.setExposureDuration(duration);
     ExposureRequest = duration;
 
@@ -1852,7 +1855,9 @@ void *ASICCD::imagingThreadEntry()
             threadRequest = StateIdle;
             //pthread_mutex_unlock(&condMutex);
             lock.unlock();
+            int oldExpRetry = expRetry;
             StartExposure(ExposureRequest);
+            expRetry = oldExpRetry;
             lock.lock();
             //pthread_mutex_lock(&condMutex);
         }
@@ -1970,8 +1975,6 @@ void ASICCD::streamVideo()
 
 void ASICCD::getExposure()
 {
-    int expRetry = 0;
-    int statRetry = 0;
     int uSecs = 1000000;
     ASI_EXPOSURE_STATUS status = ASI_EXP_IDLE;
     ASI_ERROR_CODE errCode;
